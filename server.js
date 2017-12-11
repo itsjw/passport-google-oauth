@@ -1,7 +1,11 @@
+
+
 var express = require('express');
 var passport = require('passport');
-var Strategy = require('passport-facebook').Strategy;
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+require('dotenv').config();
 
+var port = process.env.PORT || 3000;
 
 // Configure the Facebook strategy for use by Passport.
 //
@@ -10,12 +14,22 @@ var Strategy = require('passport-facebook').Strategy;
 // behalf, along with the user's profile.  The function must invoke `cb`
 // with a user object, which will be set at `req.user` in route handlers after
 // authentication.
-passport.use(new Strategy({
+passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/login/facebook/return'
+    callbackURL: 'http://localhost:3000/auth/google/callback'
   },
   function(accessToken, refreshToken, profile, cb) {
+
+
+    console.log('access Token',accessToken);
+    console.log('refreshToken',refreshToken);
+    console.log('profile',profile);
+    console.log('cb',cb);
+    
+    
+    
+    
     // In this example, the user's Facebook profile is supplied as the user
     // record.  In a production-quality application, the Facebook profile should
     // be associated with a user record in the application's database, which
@@ -66,27 +80,40 @@ app.use(passport.session());
 // Define routes.
 app.get('/',
   function(req, res) {
+    console.log('line 83', req);
+    console.log('line 84', res);
+    
     res.render('home', { user: req.user });
   });
 
 app.get('/login',
   function(req, res){
     res.render('login');
+    console.log('line 92 req', req);
+    console.log('line 92 res', res);
+    
   });
 
-app.get('/login/facebook',
-  passport.authenticate('facebook'));
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/login/facebook/return', 
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
+    console.log('line 103', req);
+    console.log('line 104', res);
+    
     res.redirect('/');
   });
 
 app.get('/profile',
   require('connect-ensure-login').ensureLoggedIn(),
   function(req, res){
+    console.log('line 112', req);
+    console.log('line 113', res);
     res.render('profile', { user: req.user });
   });
 
-app.listen(3000);
+app.listen(port, function(){
+  console.log('thx for listening on station', port);
+});
+  
