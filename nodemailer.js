@@ -8,10 +8,13 @@ nodemailer.createTestAccount((err, account) => {
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-        service: 'Gmail',
+        host:'smtp.gmail.com',
+        port:465,
+        secure: true,
         auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS 
+            type: 'OAuth2',
+            clientId: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
         }
     });
 
@@ -20,10 +23,16 @@ nodemailer.createTestAccount((err, account) => {
     // setup email data with unicode symbols
     let mailOptions = {
         from: '"Josh Nothum" <offthebenchmn@gmail.com>', // sender address
-        to: 'joshnothum@gmail.com', // list of receivers
+        to: 'joshnothum@gmail.com ', // list of receivers
         subject: 'Hello ✔', // Subject line
-        text: 'Hello from NodeMailer!!!, See you humans tomorrow!', // plain text body
-        html: '<b>Hello from NodeMailer!!! See you humans tomorrow!</b>' // html body
+        text: 'Hello from NodeMailer!!!, What up Jems?', // plain text body
+        html: '<b>Hello from NodeMailer!!! What up JEMS!</b>', // html body
+        auth:{
+            user: process.env.GMAIL_USER,
+            refreshToken: process.env.REFRESH_TOKEN,
+            accessToken: process.env.ACCESS_TOKEN,
+
+        }
     };
 
     // send mail with defined transport object
